@@ -1,0 +1,15 @@
+services:
+  app:
+    build:
+      context: .
+    container_name: bgp-landing-app
+    restart: unless-stopped
+    env_file:
+      - /home/user/bgp-landing/shared/.env.local
+    environment:
+      NODE_ENV: production
+      PORT: 3000
+      HOSTNAME: 0.0.0.0
+      NEXT_TELEMETRY_DISABLED: 1
+    ports:
+      - "127.0.0.1:3002:3000"

@@ -1,0 +1,163 @@
+.titleBlock {
+  text-align: center;
+  margin-bottom: 34px;
+}
+
+.title {
+  font-family: var(--font-roboto), sans-serif;
+  font-size: 26px;
+  font-weight: 700;
+  text-transform: uppercase;
+  color: var(--primary);
+  position: relative;
+  display: inline-block;
+  padding-bottom: 12px;
+}
+
+.title::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 60px;
+  height: 4px;
+  background-color: var(--accent);
+  border-radius: 2px;
+}
+
+.grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 28px;
+  margin-bottom: 34px;
+}
+
+.card {
+  position: relative;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.cardTitle {
+  font-family: var(--font-roboto), sans-serif;
+  font-size: 17px;
+  font-weight: 700;
+  color: var(--primary);
+}
+
+.cardDesc {
+  font-size: 14px;
+  line-height: 1.6;
+  color: #4a5568;
+}
+
+.ctaBlock {
+  text-align: center;
+}
+
+@media (min-width: 768px) {
+  .titleBlock {
+    margin-bottom: 50px;
+  }
+
+  .grid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 0;
+    margin-bottom: 48px;
+  }
+  
+  .title {
+    font-size: 32px;
+  }
+
+  .card {
+    padding: 0 26px;
+  }
+
+  .card:nth-child(odd)::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    right: 0;
+    width: 1px;
+    height: 100%;
+    background: linear-gradient(
+      180deg,
+      rgba(37, 99, 235, 0.06) 0%,
+      rgba(37, 99, 235, 0.18) 12%,
+      rgba(37, 99, 235, 0.28) 50%,
+      rgba(37, 99, 235, 0.18) 88%,
+      rgba(37, 99, 235, 0.06) 100%
+    );
+  }
+
+  .cardTitle {
+    font-size: 18px;
+  }
+
+  .cardDesc {
+    font-size: 15px;
+  }
+}
+
+@media (min-width: 1024px) {
+  .grid {
+    grid-template-columns: repeat(5, minmax(0, 1fr));
+  }
+
+  .card {
+    padding: 0 22px;
+  }
+
+  .card:nth-child(odd)::after {
+    content: none;
+  }
+
+  .card:not(:last-child)::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    right: 0;
+    width: 1px;
+    height: 100%;
+    background: linear-gradient(
+      180deg,
+      rgba(37, 99, 235, 0.06) 0%,
+      rgba(37, 99, 235, 0.18) 12%,
+      rgba(37, 99, 235, 0.28) 50%,
+      rgba(37, 99, 235, 0.18) 88%,
+      rgba(37, 99, 235, 0.06) 100%
+    );
+  }
+}
+
+@media (max-width: 767px) {
+  .titleBlock {
+    margin-bottom: 30px;
+  }
+
+  .title {
+    font-size: 24px;
+  }
+
+  .grid {
+    gap: 24px;
+    margin-bottom: 30px;
+  }
+
+  .card {
+    gap: 10px;
+  }
+
+  .cardTitle {
+    font-size: 17px;
+  }
+
+  .cardDesc {
+    font-size: 13px;
+    line-height: 1.55;
+  }
+}

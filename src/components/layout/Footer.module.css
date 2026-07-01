@@ -1,0 +1,142 @@
+.footer {
+  background-color: var(--dark);
+  color: #a0aec0;
+  padding: 60px 0 30px;
+  font-size: 14px;
+}
+
+.grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 40px;
+  margin-bottom: 40px;
+}
+
+.logoCol {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.logoWrapper {
+  background-color: transparent;
+  padding: 0;
+  border-radius: var(--border-radius);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  align-self: flex-start;
+  box-shadow: none;
+  width: fit-content;
+}
+
+.logoImg {
+  height: 54px;
+  width: auto;
+  object-fit: contain;
+}
+
+.desc {
+  line-height: 1.6;
+}
+
+.title {
+  font-family: var(--font-roboto), sans-serif;
+  color: #ffffff;
+  font-size: 16px;
+  font-weight: 700;
+  margin-bottom: 20px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.linksList {
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.linksList a {
+  transition: var(--transition);
+}
+
+.linksList a:hover {
+  color: #ffffff;
+}
+
+.contactsList {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.contactItem {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+}
+
+.contactLink {
+  color: #ffffff;
+  font-weight: 600;
+  transition: var(--transition);
+}
+
+.contactLink:hover {
+  color: var(--accent-gold);
+}
+
+.requisites {
+  font-size: 13px;
+  line-height: 1.6;
+}
+
+.bottom {
+  border-top: 1px solid rgba(255, 255, 255, 0.1);
+  padding-top: 30px;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  align-items: center;
+  text-align: center;
+}
+
+.copyright {
+  font-size: 13px;
+}
+
+.legalLinks {
+  display: flex;
+  gap: 24px;
+  flex-wrap: wrap;
+  justify-content: center;
+}
+
+.legalLinks a {
+  font-size: 13px;
+  text-decoration: underline;
+  transition: var(--transition);
+}
+
+.legalLinks a:hover {
+  color: #ffffff;
+}
+
+@media (min-width: 768px) {
+  .grid {
+    grid-template-columns: 1fr 1fr;
+  }
+}
+
+@media (min-width: 1024px) {
+  .grid {
+    grid-template-columns: 1.5fr 1fr 1fr 1.5fr;
+  }
+  
+  .bottom {
+    flex-direction: row;
+    justify-content: space-between;
+    text-align: left;
+  }
+}

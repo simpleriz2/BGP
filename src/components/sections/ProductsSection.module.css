@@ -1,0 +1,453 @@
+.titleBlock {
+  text-align: center;
+  margin-bottom: 34px;
+}
+
+.title {
+  font-family: var(--font-roboto), sans-serif;
+  font-size: 24px;
+  font-weight: 700;
+  text-transform: uppercase;
+  color: var(--primary);
+  position: relative;
+  display: inline-block;
+  padding-bottom: 12px;
+}
+
+.title::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 60px;
+  height: 4px;
+  background-color: var(--accent);
+  border-radius: 2px;
+}
+
+.productsGrid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 34px;
+}
+
+/* Product columns */
+.productRow {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+  align-items: center;
+  height: 100%;
+  padding: 0;
+}
+
+.productImgCol {
+  width: 100%;
+  max-width: none;
+  position: relative;
+  background: transparent;
+  height: 220px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.productImg {
+  width: 100%;
+  height: 100%;
+  display: block;
+  object-fit: contain;
+}
+
+.productTextCol {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.productTitle {
+  font-family: var(--font-roboto), sans-serif;
+  font-size: 21px;
+  font-weight: 700;
+  color: var(--primary);
+}
+
+.productDesc {
+  font-size: 15px;
+  line-height: 1.6;
+  color: #4a5568;
+}
+
+.listTitle {
+  font-weight: 700;
+  font-size: 14px;
+  text-transform: uppercase;
+  color: var(--dark);
+  letter-spacing: 0.5px;
+}
+
+.benefitList {
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.benefitItem {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+  font-size: 14px;
+  line-height: 1.5;
+}
+
+.checkIcon {
+  color: var(--success);
+  flex-shrink: 0;
+  margin-top: 2px;
+}
+
+.crossIcon {
+  color: var(--error);
+  flex-shrink: 0;
+  margin-top: 2px;
+}
+
+/* Fittings Section */
+.fittingsBlock {
+  margin-top: 60px;
+  background: #f1f5f9;
+  padding: 44px 0;
+}
+
+.fittingsInner {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 28px;
+}
+
+.fittingsInfo {
+  max-width: 760px;
+}
+
+.fittingsTitle {
+  font-family: var(--font-roboto), sans-serif;
+  font-size: 23px;
+  font-weight: 700;
+  text-transform: uppercase;
+  color: var(--primary);
+  margin-bottom: 16px;
+}
+
+.fittingsDesc {
+  color: #4a5568;
+  font-size: 15px;
+  line-height: 1.6;
+}
+
+.fittingsSliderShell {
+  position: relative;
+  min-width: 0;
+}
+
+.fittingsViewport {
+  position: relative;
+  overflow: hidden;
+  min-width: 0;
+}
+
+.fittingsViewport::before,
+.fittingsViewport::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  z-index: 1;
+  width: 1px;
+  height: 100%;
+  background: linear-gradient(
+    180deg,
+    rgba(37, 99, 235, 0.08) 0%,
+    rgba(37, 99, 235, 0.28) 16%,
+    rgba(37, 99, 235, 0.38) 50%,
+    rgba(37, 99, 235, 0.28) 84%,
+    rgba(37, 99, 235, 0.08) 100%
+  );
+}
+
+.fittingsViewport::before {
+  left: 0;
+}
+
+.fittingsViewport::after {
+  right: 0;
+}
+
+.fittingsTrack {
+  display: flex;
+  will-change: transform;
+}
+
+.fittingSlide {
+  flex-shrink: 0;
+  min-height: 100%;
+  padding: 0 20px;
+  border-right: 1px solid #e2e8f0;
+}
+
+.fittingSlideImage {
+  position: relative;
+  width: 100%;
+  aspect-ratio: 1 / 1;
+  margin-bottom: 18px;
+}
+
+.fittingImg {
+  object-fit: contain;
+}
+
+.fittingSlideCompactImage .fittingImg {
+  padding: 12%;
+}
+
+.fittingCardTitle {
+  font-family: var(--font-roboto), sans-serif;
+  font-size: 16px;
+  font-weight: 800;
+  text-transform: uppercase;
+  color: var(--primary);
+  line-height: 1.25;
+  min-height: 42px;
+}
+
+.fittingCardDesc {
+  margin-top: 10px;
+  color: #1f2937;
+  font-size: 14px;
+  line-height: 1.55;
+}
+
+.sliderArrow {
+  position: absolute;
+  top: 42%;
+  z-index: 2;
+  width: 48px;
+  height: 48px;
+  border: 0;
+  border-radius: 50%;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--primary);
+  color: #ffffff;
+  box-shadow: var(--shadow-md);
+  transition: background-color 0.2s ease;
+}
+
+.sliderArrow:hover {
+  background: var(--accent);
+}
+
+.sliderArrowIcon {
+  width: 24px;
+  height: 24px;
+  display: block;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 2.8;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.sliderArrowPrev {
+  left: 0;
+  transform: translate(-50%, -50%);
+}
+
+.sliderArrowNext {
+  right: 0;
+  transform: translate(50%, -50%);
+}
+
+@media (min-width: 768px) {
+  .titleBlock {
+    margin-bottom: 50px;
+  }
+
+  .title {
+    font-size: 32px;
+  }
+
+  .productsGrid {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 0;
+    align-items: stretch;
+  }
+
+  .productRow {
+    gap: 20px;
+    padding: 0 24px;
+  }
+
+  .productRow:not(:last-child)::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    right: 0;
+    width: 1px;
+    height: 100%;
+    background: linear-gradient(
+      180deg,
+      rgba(37, 99, 235, 0.06) 0%,
+      rgba(37, 99, 235, 0.18) 8%,
+      rgba(37, 99, 235, 0.28) 50%,
+      rgba(37, 99, 235, 0.18) 92%,
+      rgba(37, 99, 235, 0.06) 100%
+    );
+  }
+
+  .productImg {
+    height: 100%;
+  }
+
+  .productImgCol {
+    height: 250px;
+  }
+
+  .fittingsBlock {
+    padding: 64px 0;
+    margin-top: 80px;
+  }
+
+  .fittingsInner {
+    grid-template-columns: 1fr;
+    gap: 34px;
+  }
+
+  .fittingsInfo {
+    max-width: 820px;
+    margin: 0 auto;
+    text-align: center;
+  }
+
+  .fittingsTitle {
+    font-size: 30px;
+  }
+
+  .fittingsDesc {
+    font-size: 16px;
+  }
+
+  .fittingCardTitle {
+    font-size: 15px;
+  }
+
+  .fittingSlideImage {
+    aspect-ratio: 1 / 1.04;
+  }
+}
+
+@media (min-width: 1024px) {
+  .productImgCol {
+    width: 100%;
+    flex-shrink: 0;
+  }
+  
+  .productTextCol {
+    width: 100%;
+  }
+  
+  .productTitle {
+    font-size: 22px;
+  }
+
+}
+
+@media (max-width: 767px) {
+  .titleBlock {
+    margin-bottom: 28px;
+  }
+
+  .title {
+    font-size: 22px;
+    line-height: 1.25;
+  }
+
+  .productsGrid {
+    gap: 38px;
+  }
+
+  .productRow {
+    gap: 14px;
+  }
+
+  .productImgCol {
+    height: 190px;
+  }
+
+  .productTextCol {
+    gap: 13px;
+  }
+
+  .productTitle {
+    font-size: 19px;
+    line-height: 1.22;
+  }
+
+  .productDesc,
+  .benefitItem {
+    font-size: 13px;
+  }
+
+  .benefitList {
+    gap: 8px;
+  }
+
+  .fittingsBlock {
+    margin-top: 48px;
+    padding: 42px 0;
+  }
+
+  .fittingsInner {
+    gap: 22px;
+  }
+
+  .fittingsTitle {
+    font-size: 23px;
+  }
+
+  .fittingsDesc,
+  .fittingCardDesc {
+    font-size: 13px;
+  }
+
+  .fittingSlide {
+    padding: 0 14px;
+  }
+
+  .fittingSlideImage {
+    aspect-ratio: 4 / 3;
+    margin-bottom: 12px;
+  }
+
+  .fittingCardTitle {
+    min-height: auto;
+    font-size: 14px;
+  }
+
+  .sliderArrow {
+    top: 38%;
+    width: 40px;
+    height: 40px;
+  }
+
+  .sliderArrowPrev {
+    left: 8px;
+  }
+
+  .sliderArrowNext {
+    right: 8px;
+  }
+}

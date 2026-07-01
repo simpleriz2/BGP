@@ -1,0 +1,383 @@
+.header {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  z-index: 1100;
+}
+
+.stickyNav {
+  position: relative;
+  top: 0;
+  width: 100%;
+  background-color: #f1f5f9;
+  backdrop-filter: none;
+  border-bottom: 1px solid #e2e8f0;
+  color: var(--foreground);
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+  z-index: 1;
+  transition: var(--transition);
+}
+
+.navbar {
+  display: grid;
+  grid-template-columns: auto auto;
+  align-items: center;
+  min-height: 68px;
+  gap: 14px;
+}
+
+.logoLink {
+  display: flex;
+  align-items: center;
+}
+
+.logoWrapper {
+  background-color: transparent;
+  padding: 0;
+  border-radius: var(--border-radius);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  box-shadow: none;
+  border: none;
+  transition: var(--transition);
+}
+
+.logoLink:hover .logoWrapper {
+  transform: translateY(-1px) scale(1.02);
+}
+
+.logoImg {
+  height: 52px;
+  width: auto;
+  object-fit: contain;
+}
+
+.logoText {
+  font-family: var(--font-roboto), sans-serif;
+  font-size: 22px;
+  font-weight: 800;
+  line-height: 1;
+  color: var(--primary);
+  letter-spacing: 0.3px;
+}
+
+.navLinks {
+  display: none;
+}
+
+.navAction {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 24px;
+}
+
+.callbackButton {
+  box-shadow: 0 6px 18px rgba(59, 130, 246, 0.22);
+}
+
+.contactStack {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 4px;
+  line-height: 1.2;
+}
+
+.phoneLink {
+  font-weight: 800;
+  font-size: 16px;
+  color: var(--primary);
+  letter-spacing: 0.5px;
+  transition: var(--transition);
+  position: relative;
+}
+
+.phoneLink::after {
+  content: '';
+  position: absolute;
+  bottom: -2px;
+  left: 0;
+  width: 100%;
+  height: 1px;
+  background-color: rgba(37, 99, 235, 0.22);
+  transition: var(--transition);
+}
+
+.phoneLink:hover {
+  color: var(--accent);
+}
+
+.phoneLink:hover::after {
+  background-color: var(--accent);
+  width: 100%;
+}
+
+.emailLink {
+  font-weight: 800;
+  font-size: 16px;
+  color: var(--primary);
+  letter-spacing: 0.5px;
+  transition: var(--transition);
+}
+
+.emailLink:hover {
+  color: var(--accent);
+}
+
+.burger {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  width: 26px;
+  height: 18px;
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  z-index: 101;
+  padding: 0;
+}
+
+.burger span {
+  display: block;
+  width: 100%;
+  height: 2px;
+  background-color: var(--primary);
+  transition: var(--transition);
+  border-radius: 2px;
+}
+
+.burger.open span:nth-child(1) {
+  transform: translateY(8px) rotate(45deg);
+}
+
+.burger.open span:nth-child(2) {
+  opacity: 0;
+}
+
+.burger.open span:nth-child(3) {
+  transform: translateY(-8px) rotate(-45deg);
+}
+
+.mobileBackdrop {
+  position: fixed;
+  inset: 0;
+  right: auto;
+  display: block;
+  width: calc(100vw - min(70vw, 270px));
+  height: 100vh;
+  padding: 0;
+  border: none;
+  background: rgba(15, 23, 42, 0);
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.25s ease, background-color 0.25s ease;
+  z-index: 97;
+}
+
+.mobileBackdrop.open {
+  background: rgba(15, 23, 42, 0.48);
+  opacity: 1;
+  pointer-events: auto;
+}
+
+/* Mobile drawer */
+.mobileMenu {
+  position: fixed;
+  top: 0;
+  right: 0;
+  width: min(70vw, 270px);
+  max-width: 270px;
+  height: 100vh;
+  background-color: #0f172a;
+  color: #ffffff;
+  padding: 82px 24px 24px;
+  box-shadow: -10px 0 30px rgba(0, 0, 0, 0.25);
+  transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+  transform: translateX(105%);
+  z-index: 98;
+  display: flex;
+  flex-direction: column;
+  gap: 26px;
+}
+
+.mobileMenu.open {
+  transform: translateX(0);
+}
+
+.mobileClose {
+  position: absolute;
+  top: 18px;
+  right: 18px;
+  width: 38px;
+  height: 38px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid rgba(255, 255, 255, 0.16);
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.06);
+  color: #ffffff;
+  font-size: 30px;
+  line-height: 1;
+  cursor: pointer;
+  transition: var(--transition);
+}
+
+.mobileClose:hover {
+  background: rgba(255, 255, 255, 0.12);
+}
+
+.mobileMenuLinks {
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+}
+
+.mobileMenuLinks a {
+  font-size: 18px;
+  font-weight: 700;
+  color: #ffffff;
+  transition: var(--transition);
+  letter-spacing: 0.5px;
+}
+
+.mobileMenuLinks a:hover {
+  color: var(--accent-gold);
+  transform: translateX(4px);
+}
+
+/* Desktop styles */
+@media (min-width: 1024px) {
+  .navbar {
+    min-height: 76px;
+  }
+
+  .logoImg {
+    height: 58px;
+  }
+
+  .logoText {
+    font-size: 24px;
+  }
+
+  .navbar {
+    grid-template-columns: minmax(220px, 1fr) auto minmax(360px, 1fr);
+  }
+
+  .logoLink {
+    justify-self: start;
+  }
+
+  .navLinks {
+    display: flex;
+    justify-self: center;
+    justify-content: center;
+    gap: 34px;
+  }
+
+  .navAction {
+    justify-self: end;
+  }
+  
+  .navLinks a {
+    font-size: 13px;
+    font-weight: 800;
+    text-transform: uppercase;
+    color: rgba(23, 37, 84, 0.86);
+    transition: var(--transition);
+    position: relative;
+    padding: 8px 0;
+    letter-spacing: 0.8px;
+  }
+  
+  .navLinks a::after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 0;
+    height: 3px;
+    background-color: var(--accent);
+    transition: var(--transition);
+    border-radius: 2px;
+  }
+  
+  .navLinks a:hover {
+    color: var(--primary);
+  }
+  
+  .navLinks a:hover::after {
+    width: 100%;
+  }
+  
+  .burger {
+    display: none;
+  }
+}
+
+@media (max-width: 1023px) {
+  .navAction {
+    display: none;
+  }
+
+  .burger {
+    justify-self: end;
+  }
+
+  .navbar {
+    min-height: 62px;
+  }
+
+  .logoImg {
+    height: 44px;
+  }
+
+  .logoText {
+    font-size: 20px;
+  }
+}
+
+@media (max-width: 420px) {
+  .navbar {
+    min-height: 58px;
+  }
+
+  .logoWrapper {
+    gap: 8px;
+  }
+
+  .logoImg {
+    height: 40px;
+  }
+
+  .logoText {
+    font-size: 18px;
+  }
+
+  .burger {
+    width: 24px;
+    height: 17px;
+  }
+
+  .mobileMenu {
+    width: min(70vw, 260px);
+    padding: 70px 20px 20px;
+  }
+
+  .mobileBackdrop {
+    width: calc(100vw - min(70vw, 260px));
+  }
+
+  .mobileClose {
+    top: 16px;
+    right: 16px;
+    width: 36px;
+    height: 36px;
+    font-size: 28px;
+  }
+}
