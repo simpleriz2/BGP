@@ -1,13 +1,72 @@
 # BGP Landing
 
-Landing page for ООО "Технология-Сервис" built with Next.js.
+Лендинг компании "Технология-Сервис" на Next.js.
 
-## Requirements
+## Что внутри
 
-- Node.js 22+
-- Docker and Docker Compose plugin
+- Frontend лендинга.
+- Backend endpoint `/api/lead` для отправки заявок в Bitrix24.
+- Dockerfile и docker-compose для запуска в контейнере.
+- Публичная страница политики: `/privacy`.
 
-## Local Development
+## Важно про Bitrix24
+
+Webhook Bitrix24 не должен храниться во frontend-коде и не входит в Docker-образ.
+Его нужно передавать на сервере через переменную окружения:
+
+```env
+BITRIX24_WEBHOOK_URL=https://your-bitrix24/rest/...
+```
+
+Если переменная не задана, `/api/lead` вернет тестовый успешный ответ, но заявку в Bitrix24 не отправит.
+
+## Запуск из Docker-образа релиза
+
+1. Скачать архив образа из GitHub Releases:
+
+   https://github.com/simpleriz2/BGP/releases/tag/v1.0.0
+
+2. Загрузить образ:
+
+```bash
+gzip -dc bgp-landing-v1.0.0.tar.gz | docker load
+```
+
+3. Запустить контейнер:
+
+```bash
+docker run -d \
+  --name bgp-landing-app \
+  -p 3000:3000 \
+  -e BITRIX24_WEBHOOK_URL="https://your-bitrix24/rest/..." \
+  bgp-landing:v1.0.0
+```
+
+После запуска сайт будет доступен на `http://localhost:3000`.
+
+## Запуск через docker compose
+
+Создайте `.env.local` рядом с `docker-compose.yml`:
+
+```env
+BITRIX24_WEBHOOK_URL=https://your-bitrix24/rest/...
+```
+
+Запуск:
+
+```bash
+docker compose up -d --build
+```
+
+По умолчанию compose публикует приложение на `127.0.0.1:3002`, внутри контейнера используется порт `3000`.
+
+Проверка:
+
+```bash
+curl -I http://127.0.0.1:3002
+```
+
+## Локальная разработка
 
 ```bash
 npm ci
@@ -15,47 +74,31 @@ cp .env.example .env.local
 npm run dev
 ```
 
-Open `http://localhost:3000`.
+Открыть:
 
-## Environment
-
-Create `.env.local` locally or provide the same variable in the server environment:
-
-```env
-BITRIX24_WEBHOOK_URL=https://your-bitrix24/rest/...
+```text
+http://localhost:3000
 ```
 
-The webhook URL must stay on the backend only. Do not expose it in frontend code.
-
-If `BITRIX24_WEBHOOK_URL` is not set, `/api/lead` returns a mock success and does not send leads to Bitrix24.
-
-## Docker
-
-Build and run:
-
-```bash
-docker compose up -d --build
-```
-
-The app listens on `127.0.0.1:3002` on the host and port `3000` inside the container.
-
-Check:
-
-```bash
-curl -I http://127.0.0.1:3002
-```
-
-## Production Notes
-
-- Store `.env.local` or equivalent env file outside the repository.
-- Keep `BITRIX24_WEBHOOK_URL` secret.
-- Reverse proxy should point to `127.0.0.1:3002`.
-- `/api/lead` accepts form submissions and forwards them to Bitrix24 via `crm.lead.add.json`.
-
-## Scripts
+## Проверка перед публикацией
 
 ```bash
 npm run lint
 npm run build
-npm run start
+```
+
+## Reverse proxy
+
+Для production reverse proxy должен вести на порт приложения.
+
+Пример для compose-запуска:
+
+```text
+127.0.0.1:3002
+```
+
+Пример для прямого `docker run` из инструкции выше:
+
+```text
+127.0.0.1:3000
 ```
