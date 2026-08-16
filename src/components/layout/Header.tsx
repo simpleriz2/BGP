@@ -73,6 +73,12 @@ export default function Header({ onCallbackTrigger }: HeaderProps) {
     return () => document.removeEventListener('keydown', handleKeyDown);
   }, [isOpen]);
 
+  useEffect(() => {
+    document.body.classList.toggle('mobile-menu-open', isOpen);
+
+    return () => document.body.classList.remove('mobile-menu-open');
+  }, [isOpen]);
+
   return (
     <header className={styles.header}>
       {/* Main Sticky Navigation */}
@@ -136,7 +142,8 @@ export default function Header({ onCallbackTrigger }: HeaderProps) {
               className={`${styles.burger} ${isOpen ? styles.open : ''}`}
               onClick={toggleMenu}
               aria-expanded={isOpen}
-              aria-label="Открыть меню навигации"
+              aria-controls="mobile-navigation"
+              aria-label={isOpen ? 'Закрыть меню навигации' : 'Открыть меню навигации'}
             >
               <span></span>
               <span></span>
@@ -151,15 +158,20 @@ export default function Header({ onCallbackTrigger }: HeaderProps) {
         type="button"
         className={`${styles.mobileBackdrop} ${isOpen ? styles.open : ''}`}
         onClick={closeMenu}
-        aria-label="Р—Р°РєСЂС‹С‚СЊ РјРµРЅСЋ"
+        aria-label="Закрыть меню"
         tabIndex={isOpen ? 0 : -1}
       />
-      <div className={`${styles.mobileMenu} ${isOpen ? styles.open : ''}`}>
+      <div
+        id="mobile-navigation"
+        className={`${styles.mobileMenu} ${isOpen ? styles.open : ''}`}
+        aria-hidden={!isOpen}
+        inert={!isOpen}
+      >
         <button
           type="button"
           className={styles.mobileClose}
           onClick={closeMenu}
-          aria-label="Р—Р°РєСЂС‹С‚СЊ РјРµРЅСЋ"
+          aria-label="Закрыть меню"
         >
           ×
         </button>

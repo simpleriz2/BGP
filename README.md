@@ -6,6 +6,7 @@
 
 - Frontend лендинга.
 - Backend endpoint `/api/lead` для отправки заявок в Bitrix24.
+- Прикрепление чертежей и спецификаций к таймлайну созданного лида.
 - Dockerfile и docker-compose для запуска в контейнере.
 - Публичная страница политики: `/privacy`.
 
@@ -18,18 +19,29 @@ Webhook Bitrix24 не должен храниться во frontend-коде и 
 BITRIX24_WEBHOOK_URL=https://your-bitrix24/rest/...
 ```
 
-Если переменная не задана, `/api/lead` вернет тестовый успешный ответ, но заявку в Bitrix24 не отправит.
+Если webhook не задан, production вернет `503`, чтобы сайт не показывал ложное сообщение об
+успешной отправке. Для локальной проверки без Bitrix24 явно включите тестовый режим:
+
+```env
+LEAD_MOCK_MODE=true
+```
+
+Входящему вебхуку достаточно права `CRM`. Сайт использует методы `crm.lead.add` и
+`crm.timeline.comment.add`. Дополнительный доступ к Диску не требуется.
+
+Поддерживаемые вложения: PDF, DOC/DOCX, XLS/XLSX, JPG/JPEG, PNG, WEBP, DWG и DXF.
+Можно приложить до 5 файлов по 10 МБ, суммарно до 30 МБ. ZIP не принимается.
 
 ## Запуск из Docker-образа релиза
 
 1. Скачать архив образа из GitHub Releases:
 
-   https://github.com/simpleriz2/BGP/releases/tag/v1.0.0
+   https://github.com/simpleriz2/BGP/releases/tag/v1.1.0
 
 2. Загрузить образ:
 
 ```bash
-gzip -dc bgp-landing-v1.0.0.tar.gz | docker load
+gzip -dc bgp-landing-v1.1.0.tar.gz | docker load
 ```
 
 3. Запустить контейнер:
@@ -39,7 +51,7 @@ docker run -d \
   --name bgp-landing-app \
   -p 3000:3000 \
   -e BITRIX24_WEBHOOK_URL="https://your-bitrix24/rest/..." \
-  bgp-landing:v1.0.0
+  bgp-landing:v1.1.0
 ```
 
 После запуска сайт будет доступен на `http://localhost:3000`.

@@ -55,9 +55,6 @@ export default function FinalCTASection() {
           {/* Right Column: Inline Lead Form */}
           <div className={styles.formCol}>
             <h3 className={styles.formTitle}>Отправить заявку</h3>
-            <p className={styles.formSubtitle}>
-              Мы подготовим коммерческое предложение в течение 2 часов
-            </p>
             <LeadForm source="footer_cta" theme="light" />
           </div>
         </div>

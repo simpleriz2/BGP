@@ -77,6 +77,10 @@ body.modal-open {
   overflow: hidden;
 }
 
+body.mobile-menu-open {
+  overflow: hidden;
+}
+
 /* Utility focus state */
 *:focus-visible {
   outline: 3px solid var(--accent);

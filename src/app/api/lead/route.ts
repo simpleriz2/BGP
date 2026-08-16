@@ -1,6 +1,16 @@
 import { NextResponse } from 'next/server';
+import {
+  MAX_LEAD_FILES,
+  MAX_LEAD_FILE_SIZE,
+  MAX_LEAD_FILES_TOTAL_SIZE,
+  formatFileSize,
+  isAllowedLeadFile,
+} from '../../../lib/file-upload';
+import { validateEmail, validateName, validatePhone } from '../../../lib/validation';
 
-const BITRIX_LEAD_ADD_METHOD = 'crm.lead.add.json';
+export const runtime = 'nodejs';
+
+const MAX_REQUEST_SIZE = 32 * 1024 * 1024;
 
 type LeadRequestBody = {
   name?: string;
@@ -24,18 +34,31 @@ type BitrixResponse = {
   error_description?: string;
 };
 
-function getBitrixLeadAddUrl(webhookUrl: string) {
+type ParsedLeadRequest = LeadRequestBody & {
+  files: File[];
+};
+
+class LeadRequestError extends Error {
+  constructor(
+    message: string,
+    readonly status = 400
+  ) {
+    super(message);
+  }
+}
+
+function getBitrixMethodUrl(webhookUrl: string, method: string) {
   const trimmedUrl = webhookUrl.trim();
 
   if (!trimmedUrl) {
     return '';
   }
 
-  if (/\/crm\.lead\.add(?:\.json)?(?:\?|$)/i.test(trimmedUrl)) {
-    return trimmedUrl;
-  }
+  const webhookBaseUrl = trimmedUrl
+    .replace(/\/crm\.lead\.add(?:\.json)?(?:\?.*)?$/i, '')
+    .replace(/\/+$/, '');
 
-  return `${trimmedUrl.replace(/\/+$/, '')}/${BITRIX_LEAD_ADD_METHOD}`;
+  return `${webhookBaseUrl}/${method}.json`;
 }
 
 function getStringValue(value: unknown) {
@@ -58,9 +81,132 @@ function getLeadTitle(source: string, product: string) {
   return 'Заявка с сайта';
 }
 
+function sanitizeFileName(fileName: string) {
+  const baseName = fileName.split(/[\\/]/).pop() || 'file';
+  return baseName.replace(/[\u0000-\u001f\u007f]/g, '').slice(0, 150) || 'file';
+}
+
+function validateFiles(files: File[]) {
+  if (files.length > MAX_LEAD_FILES) {
+    throw new LeadRequestError(`Можно прикрепить не более ${MAX_LEAD_FILES} файлов.`);
+  }
+
+  let totalSize = 0;
+
+  files.forEach((file) => {
+    if (!file.size) {
+      throw new LeadRequestError(`Файл «${sanitizeFileName(file.name)}» пустой.`);
+    }
+
+    if (!isAllowedLeadFile(file.name)) {
+      throw new LeadRequestError(`Формат файла «${sanitizeFileName(file.name)}» не поддерживается.`);
+    }
+
+    if (file.size > MAX_LEAD_FILE_SIZE) {
+      throw new LeadRequestError(
+        `Файл «${sanitizeFileName(file.name)}» больше ${formatFileSize(MAX_LEAD_FILE_SIZE)}.`,
+        413
+      );
+    }
+
+    totalSize += file.size;
+  });
+
+  if (totalSize > MAX_LEAD_FILES_TOTAL_SIZE) {
+    throw new LeadRequestError(
+      `Общий размер файлов не должен превышать ${formatFileSize(MAX_LEAD_FILES_TOTAL_SIZE)}.`,
+      413
+    );
+  }
+}
+
+async function parseLeadRequest(request: Request): Promise<ParsedLeadRequest> {
+  const contentLength = Number(request.headers.get('content-length') || 0);
+  if (contentLength > MAX_REQUEST_SIZE) {
+    throw new LeadRequestError('Размер запроса превышает допустимый лимит.', 413);
+  }
+
+  const contentType = request.headers.get('content-type') || '';
+
+  if (contentType.includes('multipart/form-data')) {
+    const formData = await request.formData();
+    const files = formData
+      .getAll('files')
+      .filter((entry): entry is File => entry instanceof File && entry.size > 0);
+
+    validateFiles(files);
+
+    return {
+      name: getStringValue(formData.get('name')),
+      phone: getStringValue(formData.get('phone')),
+      email: getStringValue(formData.get('email')),
+      message: getStringValue(formData.get('message')),
+      source: getStringValue(formData.get('source')),
+      product: getStringValue(formData.get('product')),
+      utm_source: getStringValue(formData.get('utm_source')),
+      utm_medium: getStringValue(formData.get('utm_medium')),
+      utm_campaign: getStringValue(formData.get('utm_campaign')),
+      utm_content: getStringValue(formData.get('utm_content')),
+      utm_term: getStringValue(formData.get('utm_term')),
+      referrer: getStringValue(formData.get('referrer')),
+      page_url: getStringValue(formData.get('page_url')),
+      files,
+    };
+  }
+
+  if (!contentType.includes('application/json')) {
+    throw new LeadRequestError('Неподдерживаемый формат запроса.', 415);
+  }
+
+  const body = (await request.json()) as LeadRequestBody;
+  return { ...body, files: [] };
+}
+
+async function callBitrix<T extends BitrixResponse>(
+  url: string,
+  payload: unknown
+): Promise<T> {
+  const response = await fetch(url, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify(payload),
+  });
+
+  const responseText = await response.text();
+
+  if (!response.ok) {
+    console.error('Bitrix24 API responded with HTTP error:', {
+      status: response.status,
+      body: responseText,
+    });
+    throw new Error(`Bitrix24 API Error: ${response.status}`);
+  }
+
+  let responseData: T;
+  try {
+    responseData = JSON.parse(responseText) as T;
+  } catch {
+    console.error('Bitrix24 API returned non-JSON response.');
+    throw new Error('Bitrix24 API returned non-JSON response');
+  }
+
+  if (responseData.error) {
+    console.error('Bitrix24 API returned application error:', {
+      error: responseData.error,
+      description: responseData.error_description,
+    });
+    throw new Error('Bitrix24 API returned an error');
+  }
+
+  return responseData;
+}
+
 export async function POST(request: Request) {
   try {
-    const body = (await request.json()) as LeadRequestBody;
+    const body = await parseLeadRequest(request);
+    const files = body.files;
 
     const name = getStringValue(body.name);
     const phone = getStringValue(body.phone);
@@ -76,9 +222,10 @@ export async function POST(request: Request) {
     const referrer = getStringValue(body.referrer);
     const page_url = getStringValue(body.page_url);
 
-    if (!name || !phone) {
+    const validationError = validateName(name) || validatePhone(phone) || validateEmail(email);
+    if (validationError) {
       return NextResponse.json(
-        { success: false, error: 'Имя и телефон обязательны для заполнения.' },
+        { success: false, error: validationError },
         { status: 400 }
       );
     }
@@ -133,68 +280,89 @@ export async function POST(request: Request) {
       product: product || null,
       hasEmail: Boolean(email),
       hasMessage: Boolean(message),
+      fileCount: files.length,
       pageUrl: page_url || null,
     });
     console.log('==================================================');
 
     const bitrixWebhookUrl = getStringValue(process.env.BITRIX24_WEBHOOK_URL);
-    const bitrixLeadAddUrl = getBitrixLeadAddUrl(bitrixWebhookUrl);
+    const bitrixLeadAddUrl = getBitrixMethodUrl(bitrixWebhookUrl, 'crm.lead.add');
 
     if (bitrixLeadAddUrl) {
       console.log('Forwarding lead to Bitrix24 CRM...');
 
-      const response = await fetch(bitrixLeadAddUrl, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(bitrix24Payload),
-      });
-
-      const responseText = await response.text();
-
-      if (!response.ok) {
-        console.error('Bitrix24 API responded with HTTP error:', {
-          status: response.status,
-          body: responseText,
-        });
-        throw new Error(`Bitrix24 API Error: ${response.status}`);
-      }
-
-      let responseData: BitrixResponse;
-      try {
-        responseData = JSON.parse(responseText) as BitrixResponse;
-      } catch {
-        console.error('Bitrix24 API returned non-JSON response.');
-        throw new Error('Bitrix24 API returned non-JSON response');
-      }
-
-      if (responseData.error) {
-        console.error('Bitrix24 API returned application error:', {
-          error: responseData.error,
-          description: responseData.error_description,
-        });
-        throw new Error('Bitrix24 API returned an error');
-      }
+      const responseData = await callBitrix<BitrixResponse>(bitrixLeadAddUrl, bitrix24Payload);
+      const leadId = responseData.result;
 
       console.log('Bitrix24 lead created successfully:', {
-        leadId: responseData.result ?? null,
+        leadId: leadId ?? null,
       });
+
+      let attachmentWarning: string | undefined;
+
+      if (files.length && leadId) {
+        try {
+          const preparedFiles = await Promise.all(
+            files.map(async (file) => [
+              sanitizeFileName(file.name),
+              Buffer.from(await file.arrayBuffer()).toString('base64'),
+            ])
+          );
+
+          await callBitrix(
+            getBitrixMethodUrl(bitrixWebhookUrl, 'crm.timeline.comment.add'),
+            {
+              fields: {
+                ENTITY_ID: leadId,
+                ENTITY_TYPE: 'lead',
+                COMMENT: 'Файлы, прикреплённые к заявке с сайта',
+                FILES: preparedFiles,
+              },
+            }
+          );
+
+          console.log('Lead files attached successfully:', { leadId, fileCount: files.length });
+        } catch (attachmentError) {
+          console.error('Lead was created, but file attachment failed:', attachmentError);
+          attachmentWarning =
+            'Заявка создана, но файлы не удалось прикрепить. Менеджер свяжется с вами для уточнения.';
+        }
+      }
 
       return NextResponse.json({
         success: true,
         message: 'Заявка успешно отправлена и зафиксирована в CRM.',
-        leadId: responseData.result ?? null,
+        leadId: leadId ?? null,
+        attachmentWarning,
       });
     }
 
-    console.log('Bitrix24 webhook URL is not configured. Returning local mock success.');
-    return NextResponse.json({
-      success: true,
-      message: 'Заявка успешно зафиксирована на сервере (режим симуляции Битрикс24).',
-      payload: bitrix24Payload,
-    });
+    if (process.env.LEAD_MOCK_MODE === 'true') {
+      console.log('Bitrix24 webhook URL is not configured. Returning explicit mock success.');
+      return NextResponse.json({
+        success: true,
+        message: 'Заявка успешно зафиксирована на сервере (режим симуляции Битрикс24).',
+        payload: bitrix24Payload,
+        files: files.map((file) => ({ name: sanitizeFileName(file.name), size: file.size })),
+      });
+    }
+
+    console.error('Bitrix24 webhook URL is not configured. Lead was not sent.');
+    return NextResponse.json(
+      {
+        success: false,
+        error: 'Сервис отправки заявок временно недоступен. Пожалуйста, свяжитесь с нами по телефону.',
+      },
+      { status: 503 }
+    );
   } catch (error) {
+    if (error instanceof LeadRequestError) {
+      return NextResponse.json(
+        { success: false, error: error.message },
+        { status: error.status }
+      );
+    }
+
     console.error('Lead processing error:', error);
     return NextResponse.json(
       { success: false, error: 'Произошла внутренняя ошибка сервера при отправке лида.' },

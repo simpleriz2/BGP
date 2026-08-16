@@ -19,7 +19,7 @@
   color: var(--foreground);
   width: 100%;
   max-width: 500px;
-  max-height: min(86vh, 760px);
+  max-height: min(94vh, 900px);
   border-radius: var(--border-radius);
   box-shadow: var(--shadow-lg);
   overflow: hidden;
@@ -39,7 +39,7 @@
 
 .lg {
   max-width: 760px;
-  max-height: min(78vh, 620px);
+  max-height: min(92vh, 820px);
 }
 
 .header {
@@ -87,7 +87,7 @@
   }
 
   .modal {
-    max-height: 88vh;
+    max-height: 92vh;
     border-radius: 8px;
   }
 

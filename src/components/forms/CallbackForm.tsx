@@ -15,11 +15,13 @@ export default function CallbackForm({ onSuccess }: CallbackFormProps) {
   const [name, setName] = useState('');
   const [phone, setPhone] = useState('');
   const [time, setTime] = useState('');
+  const [isAgreed, setIsAgreed] = useState(true);
   
   // Anti-spam Honeypot
   const [honey, setHoney] = useState('');
   
   const [phoneError, setPhoneError] = useState<string | null>(null);
+  const [agreementError, setAgreementError] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const [isSuccess, setIsSuccess] = useState(false);
   const [submitError, setSubmitError] = useState<string | null>(null);
@@ -27,6 +29,7 @@ export default function CallbackForm({ onSuccess }: CallbackFormProps) {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setPhoneError(null);
+    setAgreementError(null);
     setSubmitError(null);
 
     // 1. Honeypot check
@@ -39,6 +42,11 @@ export default function CallbackForm({ onSuccess }: CallbackFormProps) {
     const phoneErr = validatePhone(phone);
     if (phoneErr) {
       setPhoneError(phoneErr);
+      return;
+    }
+
+    if (!isAgreed) {
+      setAgreementError('Необходимо согласие на обработку персональных данных');
       return;
     }
 
@@ -82,7 +90,7 @@ export default function CallbackForm({ onSuccess }: CallbackFormProps) {
 
   if (isSuccess) {
     return (
-      <div className={styles.successBanner}>
+      <div className={styles.successBanner} role="status">
         <h4 style={{ fontWeight: 'bold', fontSize: '18px', marginBottom: '8px' }}>
           Заявка принята!
         </h4>
@@ -94,7 +102,7 @@ export default function CallbackForm({ onSuccess }: CallbackFormProps) {
   return (
     <>
     <form onSubmit={handleSubmit} noValidate>
-      {submitError && <div className={styles.errorBanner}>{submitError}</div>}
+      {submitError && <div className={styles.errorBanner} role="alert">{submitError}</div>}
 
       {/* Honeypot field */}
       <div className={styles.honeypot}>
@@ -161,7 +169,11 @@ export default function CallbackForm({ onSuccess }: CallbackFormProps) {
           type="checkbox"
           id="callback-agree"
           className={styles.checkbox}
-          defaultChecked
+          checked={isAgreed}
+          onChange={(event) => {
+            setIsAgreed(event.target.checked);
+            setAgreementError(null);
+          }}
           required
         />
         <Link
@@ -173,6 +185,11 @@ export default function CallbackForm({ onSuccess }: CallbackFormProps) {
           {consentLabelText} *
         </Link>
       </div>
+      {agreementError && (
+        <span className={`${styles.errorText} ${styles.agreementError}`} role="alert">
+          {agreementError}
+        </span>
+      )}
 
       <Button
         type="submit"
